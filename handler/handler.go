@@ -7,15 +7,25 @@ import (
 )
 
 type Handler struct {
-	userService *service.UserService
+	services *service.Service
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(services *service.Service) *Handler {
+	return &Handler{services}
 }
 
-func Run() *gin.Engine {
-	r := gin.Default()
+func (h *Handler) InitRoutes() *gin.Engine {
+	router := gin.Default()
 
-	return r
+	v1 := router.Group("/api/v1")
+	{
+		users := v1.Group("/users")
+		{
+			users.POST("/sign-up", h.CreateUser)
+			users.PUT("/update", h.UpdateUser)
+			users.DELETE("/delete/:id", h.DeleteUser)
+			users.GET("/:id", h.GetUserById)
+		}
+	}
+	return router
 }

@@ -9,16 +9,26 @@ import (
 )
 
 func (h *Handler) CreateUser(ctx *gin.Context) {
-	user := models.User{}
+	user := models.CreateUserDTO{}
 	if err := ctx.BindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := h.userService.CreateUser(user); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := h.services.User.CreateUser(user); err != nil {
+		NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "User created"})
+	NewSuccessResponse(ctx, "User created")
+}
+
+func (h *Handler) UpdateUser(ctx *gin.Context) {
+	// Implement update user controller
+}
+func (h *Handler) DeleteUser(ctx *gin.Context) {
+	// Implement delete user controller
+}
+func (h *Handler) GetUserById(ctx *gin.Context) {
+	// Implement retrive user by id controller
 }
