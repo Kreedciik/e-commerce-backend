@@ -6,10 +6,12 @@ import (
 
 type Repository struct {
 	User
+	Product
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
-		User: NewUserPostgres(db),
+		User:    NewUserPostgres(db),
+		Product: NewProductPostgres(db),
 	}
 }
