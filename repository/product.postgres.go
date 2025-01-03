@@ -13,6 +13,7 @@ type Product interface {
 	UpdateProduct(product models.UpdateProductDTO) error
 	DeleteProduct(id string) error
 	GetProducts(name, description string) ([]models.Product, error)
+	FindProductById(id string) (models.Product, error)
 }
 
 type ProductPostgres struct {
@@ -86,4 +87,30 @@ func (p *ProductPostgres) GetProducts(name, description string) ([]models.Produc
 	}
 
 	return products, nil
+}
+
+func (p *ProductPostgres) FindProductById(id string) (models.Product, error) {
+	product := models.Product{}
+	rows, err := p.db.Query(`SELECT id, name, description, price, stock
+	FROM products
+	WHERE id = $1
+	`, id,
+	)
+
+	if err != nil {
+		return product, err
+	}
+
+	defer rows.Close()
+
+	err = rows.Scan(&product.Id, &product.Name,
+		&product.Description, &product.Price,
+		&product.Stock,
+	)
+
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
 }
