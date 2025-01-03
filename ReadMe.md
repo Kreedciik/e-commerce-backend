@@ -24,7 +24,21 @@ Open the terminal in project folder and type this command
 go mod tidy
 ```
 
-To run application type
+Configure your postgres database credentials through constants. It's written in cmd/main.go. If your credentials same with these then just copy and paste this:
+
+```go
+const (
+	host     = "localhost"
+	port     = "5432"
+	user     = "postgres"
+	password = "root"
+	dbName   = "ecommerce"
+	sslMode  = "disable"
+)
+```
+
+Create a new database ecommerce if it does not exist.
+To run application
 
 ```bash
 go run cmd/main.go
