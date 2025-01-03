@@ -4,7 +4,7 @@ create type roles as enum('admin', 'user');
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
-    role role not null default 'user',
+    role roles not null default 'user',
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL default '',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
