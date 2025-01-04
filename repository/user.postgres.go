@@ -37,22 +37,27 @@ func (u *UserPostgres) InsertUser(user models.CreateUserDTO) error {
 	return nil
 }
 
-func (u *UserPostgres) UpdateUser(user models.UpdateUserDTO) error {
-	_, err := u.db.Exec(`
-	UPDATE users  SET 
-	name = $1, role = $2, email = $3
-	WHERE id = $1`,
-		user.Name, user.Role,
-		user.Email, user.Id)
+func (u *UserPostgres) DeleteUser(id string) error {
+	_, err := u.db.Exec(`DELETE FROM users WHERE id = $1`, id)
 	return err
 }
 
-func (u *UserPostgres) DeleteUser(id string) error {
-	// Implement delete in database
-	return nil
+func (u *UserPostgres) FindUserByID(id string) (models.User, error) {
+	var user models.User
+
+	err := u.db.QueryRow(`SELECT id, name, role, email FROM users WHERE id = $1`, id).
+		Scan(&user.Id, &user.Name, &user.Role, &user.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.User{}, nil
+		}
+		return models.User{}, err
+	}
+
+	return user, nil
 }
 
-func (u *UserPostgres) FindUserByID(id string) (models.User, error) {
-	// Implement retriving user by ID
-	return models.User{}, nil
+// Need to implement
+func (u *UserPostgres) UpdateUser(user models.UpdateUserDTO) error {
+	return nil
 }
