@@ -59,5 +59,18 @@ func (u *UserPostgres) FindUserByID(id string) (models.User, error) {
 
 // Need to implement
 func (u *UserPostgres) UpdateUser(user models.UpdateUserDTO) error {
+	query := `
+		UPDATE users
+		SET 
+			name = COALESCE(NULLIF($1, ''), name), 
+			role = COALESCE(NULLIF($2, ''), role), 
+			email = COALESCE(NULLIF($3, ''), email)
+		WHERE id = $4
+	`
+
+	_, err := u.db.Exec(query, user.Name, user.Role, user.Email, user.Id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
