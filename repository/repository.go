@@ -8,6 +8,7 @@ type Repository struct {
 	User
 	Product
 	Cart
+	Order
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -15,5 +16,6 @@ func NewRepository(db *sql.DB) *Repository {
 		User:    NewUserPostgres(db),
 		Product: NewProductPostgres(db),
 		Cart:    NewCartPostgres(db),
+		Order:   NewOrderPostgres(db),
 	}
 }

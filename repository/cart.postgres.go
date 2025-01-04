@@ -10,7 +10,7 @@ import (
 type Cart interface {
 	InsertToCart(product models.PutToCartDTO) error
 	RemoveFromCart(userId, productId string) error
-	FindAllProductsFromCart(userId string) ([]models.Product, error)
+	FindAllProductsFromCart(userId string) ([]models.CartProduct, error)
 }
 
 type CartPostgres struct {
@@ -46,10 +46,11 @@ func (c *CartPostgres) RemoveFromCart(userId, productId string) error {
 	return err
 }
 
-func (c *CartPostgres) FindAllProductsFromCart(userId string) ([]models.Product, error) {
-	products := []models.Product{}
+func (c *CartPostgres) FindAllProductsFromCart(userId string) ([]models.CartProduct, error) {
+	products := []models.CartProduct{}
 	rows, err := c.db.Query(`
-	SELECT p.id, p.name, p.description, p.price, p.stock
+	SELECT p.id, p.name, p.description, p.price, p.stock,
+	c.quantity
 	FROM products p
 	INNER JOIN carts c ON c.product_id = p.product_id
 	WHERE c.user_id = $1
@@ -61,10 +62,11 @@ func (c *CartPostgres) FindAllProductsFromCart(userId string) ([]models.Product,
 	defer rows.Close()
 
 	for rows.Next() {
-		product := models.Product{}
+		product := models.CartProduct{}
 		err := rows.Scan(&product.Id, &product.Name,
 			&product.Description, &product.Price,
 			&product.Stock,
+			&product.Quantity,
 		)
 
 		if err != nil {

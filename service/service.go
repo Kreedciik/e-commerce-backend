@@ -8,6 +8,7 @@ type Service struct {
 	User
 	Product
 	Cart
+	Order
 }
 
 func NewService(repository *repository.Repository) *Service {
@@ -15,5 +16,9 @@ func NewService(repository *repository.Repository) *Service {
 		User:    NewUserService(repository),
 		Product: NewProductService(repository),
 		Cart:    NewCartService(repository, repository.Product),
+		Order: NewOrderService(repository,
+			repository.Product,
+			repository.Cart,
+		),
 	}
 }

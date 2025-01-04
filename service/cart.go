@@ -14,7 +14,7 @@ type CartService struct {
 type Cart interface {
 	PutToCart(item models.PutToCartDTO) error
 	RemoveFromCart(userId, productId string) error
-	GetProductsFromCart(userId string) ([]models.Product, error)
+	GetProductsFromCart(userId string) ([]models.CartProduct, error)
 }
 
 func NewCartService(repository repository.Cart, productRepo repository.Product) *CartService {
@@ -39,6 +39,6 @@ func (c *CartService) RemoveFromCart(userId, productId string) error {
 	return c.repository.RemoveFromCart(userId, productId)
 }
 
-func (c *CartService) GetProductsFromCart(userId string) ([]models.Product, error) {
+func (c *CartService) GetProductsFromCart(userId string) ([]models.CartProduct, error) {
 	return c.repository.FindAllProductsFromCart(userId)
 }

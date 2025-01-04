@@ -41,6 +41,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			carts.DELETE("/:id", h.RemoveProductFromCart)
 			carts.GET("/:id", h.GetProductsFromCart)
 		}
+
+		checkout := v1.Group("/checkout")
+		{
+			checkout.POST("", h.Checkout)
+		}
 	}
 	return router
 }
