@@ -30,9 +30,6 @@ func NewOrderService(
 }
 
 func (o *OrderService) CreateOrder(checkoutDetail models.CreateCheckoutDTO) error {
-	// 1. Insert into order table
-	// 2. Insert into order item table
-	// 3. Remove from the cart table
 	var (
 		totalPrice float64
 		orderItems []models.OrderItemCreateDTO
@@ -43,7 +40,6 @@ func (o *OrderService) CreateOrder(checkoutDetail models.CreateCheckoutDTO) erro
 	if err != nil {
 		return err
 	}
-
 	for _, product := range products {
 		totalPrice += product.Price * float64(product.Quantity)
 		orderItems = append(orderItems, models.OrderItemCreateDTO{

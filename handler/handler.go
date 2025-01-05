@@ -17,17 +17,22 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
-	v1 := router.Group("/api/v1")
+	auth := router.Group("/auth")
+	{
+		auth.POST("/sign-up", h.CreateUser)
+		auth.POST("/sign-in", h.LoginUser)
+	}
+
+	v1 := router.Group("/api/v1", h.CheckAuthMiddleware)
 	{
 		users := v1.Group("/users")
 		{
-			users.POST("/sign-up", h.CreateUser)
 			users.PUT("/update", h.UpdateUser)
 			users.DELETE("/delete/:id", h.DeleteUser)
 			users.GET("/:id", h.GetUserById)
 		}
 
-		products := v1.Group("/products")
+		products := v1.Group("/products", h.CheckAdminMiddleware)
 		{
 			products.POST("/create", h.CreateProduct)
 			products.PUT("/update", h.UpdateProduct)

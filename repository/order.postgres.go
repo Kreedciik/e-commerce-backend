@@ -69,7 +69,7 @@ func (o *OrderPostgres) InsertOrder(
 		}
 
 		_, err = tx.Exec(`
-		UPDATE products SET quantity = quantity - $1
+		UPDATE products SET stock = stock - $1
 		WHERE id = $2
 		`,
 			orderItem.Quantity,

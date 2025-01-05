@@ -8,6 +8,7 @@ import (
 
 func NewErrorResponse(ctx *gin.Context, statusCode int, message string) {
 	ctx.JSON(statusCode, gin.H{"error": message, "code": statusCode})
+	ctx.Abort()
 }
 
 func NewSuccessResponse(ctx *gin.Context, message interface{}) {

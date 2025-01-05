@@ -91,19 +91,13 @@ func (p *ProductPostgres) GetProducts(name, description string) ([]models.Produc
 
 func (p *ProductPostgres) FindProductById(id string) (models.Product, error) {
 	product := models.Product{}
-	rows, err := p.db.Query(`SELECT id, name, description, price, stock
+	row := p.db.QueryRow(`SELECT id, name, description, price, stock
 	FROM products
 	WHERE id = $1
 	`, id,
 	)
 
-	if err != nil {
-		return product, err
-	}
-
-	defer rows.Close()
-
-	err = rows.Scan(&product.Id, &product.Name,
+	err := row.Scan(&product.Id, &product.Name,
 		&product.Description, &product.Price,
 		&product.Stock,
 	)

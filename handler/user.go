@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"ecommerce/config"
 	"ecommerce/models"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 
 func (h *Handler) CreateUser(ctx *gin.Context) {
 	user := models.CreateUserDTO{}
-	if err := ctx.BindJSON(&user); err != nil {
+	if err := ctx.ShouldBindJSON(&user); err != nil {
 		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -36,7 +37,6 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 	}
 
 	NewSuccessResponse(ctx, "User updated")
-	// Implement update user controller
 }
 func (h *Handler) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -73,4 +73,33 @@ func (h *Handler) GetUserById(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, user)
 	// Implement retrive user by id controller
+}
+
+func (h *Handler) LoginUser(ctx *gin.Context) {
+	var authInput models.AuthDTO
+	if err := ctx.ShouldBindJSON(&authInput); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	foundedUser, err := h.services.User.GetUserByEmail(authInput.Email)
+	if err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, "user not found")
+		return
+	}
+
+	if err := h.services.User.ComparePasswords(foundedUser.Password, authInput.Password); err != nil {
+		NewErrorResponse(ctx, http.StatusBadRequest, "invalid password")
+		return
+	}
+
+	accessToken, err := h.services.GenerateAccessToken(foundedUser, config.TOKEN_EXPIRE_DURATION, config.SECRET_KEY)
+
+	if err != nil {
+		NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	NewSuccessResponse(ctx, gin.H{"accessToken": accessToken})
+
 }

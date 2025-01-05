@@ -52,7 +52,7 @@ func (c *CartPostgres) FindAllProductsFromCart(userId string) ([]models.CartProd
 	SELECT p.id, p.name, p.description, p.price, p.stock,
 	c.quantity
 	FROM products p
-	INNER JOIN carts c ON c.product_id = p.product_id
+	INNER JOIN carts c ON c.product_id = p.id
 	WHERE c.user_id = $1
 	`, userId)
 

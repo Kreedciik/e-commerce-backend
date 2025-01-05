@@ -13,6 +13,7 @@ type User interface {
 	UpdateUser(user models.UpdateUserDTO) error
 	DeleteUser(id string) error
 	FindUserByID(id string) (models.User, error)
+	FindUserByEmail(email string) (models.User, error)
 }
 
 type UserPostgres struct {
@@ -27,9 +28,9 @@ func NewUserPostgres(db *sql.DB) *UserPostgres {
 
 func (u *UserPostgres) InsertUser(user models.CreateUserDTO) error {
 	id := uuid.NewString()
-	_, err := u.db.Exec(`INSERT INTO users (id, name, role, email)
-	 VALUES ($1, $2, $3, $4)`,
-		id, user.Name, user.Role, user.Email)
+	_, err := u.db.Exec(`INSERT INTO users (id, name, role, email, password)
+	 VALUES ($1, $2, $3, $4, $5)`,
+		id, user.Name, user.Role, user.Email, user.Password)
 	if err != nil {
 		return err
 	}
@@ -57,14 +58,29 @@ func (u *UserPostgres) FindUserByID(id string) (models.User, error) {
 	return user, nil
 }
 
+func (u *UserPostgres) FindUserByEmail(email string) (models.User, error) {
+	var user models.User
+
+	err := u.db.QueryRow(`SELECT id, name, role, email, password FROM users WHERE email = $1`, email).
+		Scan(&user.Id, &user.Name, &user.Role, &user.Email, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.User{}, nil
+		}
+		return models.User{}, err
+	}
+
+	return user, nil
+}
+
 // Need to implement
 func (u *UserPostgres) UpdateUser(user models.UpdateUserDTO) error {
 	query := `
 		UPDATE users
 		SET 
-			name = COALESCE(NULLIF($1, ''), name), 
-			role = COALESCE(NULLIF($2, ''), role), 
-			email = COALESCE(NULLIF($3, ''), email)
+			name = $1, 
+			role = $2, 
+			email = $3
 		WHERE id = $4
 	`
 
